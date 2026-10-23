@@ -1,0 +1,32 @@
+# СТАТУС: ИЗМЕНЕНО (Исправлен versionRange для мода recruits)
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="recruitsaddon"
+version="1.0.0"
+displayName="Recruits Addon"
+authors="YourName"
+description='''Adds a command to instantly hire recruits.'''
+
+[[dependencies.recruitsaddon]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.recruitsaddon]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.recruitsaddon]]
+    modId="recruits"
+    mandatory=true
+    versionRange="[1.15.0,)"
+    ordering="AFTER"
+    side="BOTH"
