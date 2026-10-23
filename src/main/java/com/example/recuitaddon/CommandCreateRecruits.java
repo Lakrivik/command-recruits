@@ -29,6 +29,16 @@ import java.util.stream.Collectors;
 
 public class CommandCreateRecruits {
 
+    // Сопоставление коротких имён типов с путями в реестре Recruits
+    private static final Map<String, String> TYPE_TO_REGISTRY = Map.of(
+            "recruit", "recruit",
+            "shieldman", "recruit_shieldman",
+            "bowman", "bowman",
+            "crossbowman", "crossbowman",
+            "horseman", "horseman",
+            "nomad", "nomad"
+    );
+
     // Сопоставление типов рекрутов с именами групп в моде Recruits
     private static final Map<String, String> TYPE_TO_GROUP = Map.of(
             "recruit", "Infantry",
@@ -52,15 +62,10 @@ public class CommandCreateRecruits {
                                         .executes(ctx -> createRecruits(ctx, ctx.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(ctx, "count"), "recruit"))
                                         // Вариант с типом, но без игрока
                                         .then(Commands.argument("type", StringArgumentType.word())
+                                                // Tab-автодополнение: показываем короткие имена типов,
+                                                // которые команда реально принимает
                                                 .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
-                                                        ForgeRegistries.ENTITY_TYPES.getValues().stream()
-                                                                .filter(type -> {
-                                                                    ResourceLocation key = ForgeRegistries.ENTITY_TYPES.getKey(type);
-                                                                    return key != null && key.getNamespace().equals("recruits");
-                                                                })
-                                                                .filter(type -> AbstractRecruitEntity.class.isAssignableFrom(type.getBaseClass()))
-                                                                .map(type -> ForgeRegistries.ENTITY_TYPES.getKey(type).getPath())
-                                                                .collect(Collectors.toList()),
+                                                        TYPE_TO_REGISTRY.keySet(),
                                                         builder
                                                 ))
                                                 .executes(ctx -> createRecruits(ctx, ctx.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(ctx, "count"), StringArgumentType.getString(ctx, "type")))
@@ -78,8 +83,9 @@ public class CommandCreateRecruits {
         ServerLevel level = (ServerLevel) target.level();
         RecruitsGroupsManager groupsManager = RecruitEvents.recruitsGroupsManager;
 
-        // Получаем тип сущности по имени
-        ResourceLocation rl = new ResourceLocation("recruits", typeName.equals("shieldman") ? "recruit_shieldman" : typeName);
+        // Получаем тип сущности по имени (через маппинг коротких имён → registry path)
+        String registryPath = TYPE_TO_REGISTRY.getOrDefault(typeName, typeName);
+        ResourceLocation rl = new ResourceLocation("recruits", registryPath);
         EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(rl);
         if (entityType == null || !(entityType.create(level) instanceof AbstractRecruitEntity)) {
             ctx.getSource().sendFailure(Component.literal("§cНеизвестный тип рекрута: " + typeName + ". Использую обычного рекрута."));
