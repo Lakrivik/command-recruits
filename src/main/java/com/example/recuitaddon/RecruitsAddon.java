@@ -1,5 +1,3 @@
-// СТАТУС: ИЗМЕНЕНО (Убраны русские буквы из комментариев)
-// RENAME THIS FILE TO: RecruitsAddon.java
 package com.example.recuitaddon;
 
 import net.minecraftforge.common.MinecraftForge;
